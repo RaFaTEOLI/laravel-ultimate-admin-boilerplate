@@ -10,6 +10,7 @@
         "production": "mix --production"
     },
     "devDependencies": {
+        "@prettier/plugin-php": "^0.16.1",
         "@fortawesome/fontawesome-free": "^5.15.1",
         "@tailwindcss/forms": "^0.2.1",
         "@tailwindcss/typography": "^0.3.0",
