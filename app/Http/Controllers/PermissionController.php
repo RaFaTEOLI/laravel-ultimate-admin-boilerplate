@@ -5,11 +5,13 @@ namespace App\Http\Controllers;
 use App\Http\Requests\Permission\PermissionRequest;
 use App\Repositories\PermissionRepository\PermissionRepository;
 use App\Services\Permission\CreatePermissionService;
+use App\Traits\ReturnHandler;
 use Illuminate\Http\Request;
 use Exception;
 
 class PermissionController extends Controller
 {
+    use ReturnHandler;
     private $permissionRepository;
 
     public function __construct()
@@ -18,13 +20,11 @@ class PermissionController extends Controller
         $this->permissionRepository = new PermissionRepository();
     }
 
-    public function index()
+    public function index(Request $request)
     {
         $permissions = $this->permissionRepository->all();
 
-        return view("admin/permission/permissions", [
-            "permissions" => $permissions,
-        ]);
+        return $this->loaded($request, ["permissions" => $permissions], 200, "admin/permission/permissions");
     }
 
     public function store(PermissionRequest $request)
@@ -35,19 +35,17 @@ class PermissionController extends Controller
             $createPermissionService = new CreatePermissionService();
             $createPermissionService->execute($input);
 
-            return redirect()
-                ->route("permissions")
-                ->withSuccess(__("actions.success"));
+            return $this->success($request, "permissions");
         } catch (Exception $e) {
-            return back()->with("error", __("actions.error"));
+            return $this->error($request, __("actions.error"), $e->getCode());
         }
     }
 
-    public function show($id)
+    public function show($id, Request $request)
     {
         $permission = $this->permissionRepository->findById($id);
 
-        return view("admin/permission/permission", ["permission" => $permission]);
+        return $this->loaded($request, ["permission" => $permission], 200, "admin/permission/permission");
     }
 
     public function update($id, Request $request)
@@ -55,21 +53,17 @@ class PermissionController extends Controller
         $input = $request->only(["name", "display_name", "description"]);
         $this->permissionRepository->update($id, $input);
 
-        return redirect()
-            ->route("permissions")
-            ->withSuccess(__("actions.success"));
+        return $this->success($request, "permissions");
     }
 
-    public function destroy($id)
+    public function destroy($id, Request $request)
     {
         try {
             $this->permissionRepository->delete($id);
 
-            return redirect()
-                ->route("permissions")
-                ->withSuccess(__("actions.success"));
+            return $this->success($request, "permissions");
         } catch (Exception $e) {
-            return back()->with("error", __("actions.error"));
+            return $this->error($request, __("actions.error"), $e->getCode());
         }
     }
 }

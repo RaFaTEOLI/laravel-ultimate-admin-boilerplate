@@ -6,11 +6,15 @@ use Exception;
 use App\Services\RolePermission\UpdateRolePermissionService;
 use App\Services\RolePermission\RemoveRolePermissionService;
 use App\Http\Requests\RolePermission\RolePermissionRequest;
+use App\Traits\ReturnHandler;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
 class RolesPermissionController extends Controller
 {
-    public function store($roleId, $permissionId)
+    use ReturnHandler;
+
+    public function store($roleId, $permissionId, Request $request)
     {
         try {
             $validator = Validator::make(
@@ -27,15 +31,13 @@ class RolesPermissionController extends Controller
             $updateRolePermissionService = new UpdateRolePermissionService();
             $updateRolePermissionService->execute(["roleId" => $roleId, "permissionId" => $permissionId]);
 
-            return redirect()
-                ->route("roles.show", ["id" => $roleId])
-                ->withSuccess(__("actions.success"));
+            return $this->success($request, "roles.show", ["id" => $roleId]);
         } catch (Exception $e) {
-            return back()->with("error", __("actions.error"));
+            return $this->error($request, __("actions.error"), $e->getCode());
         }
     }
 
-    public function destroy($roleId, $permissionId)
+    public function destroy($roleId, $permissionId, Request $request)
     {
         try {
             $validator = Validator::make(
@@ -53,11 +55,9 @@ class RolesPermissionController extends Controller
             $removeRolePermissionService = new RemoveRolePermissionService();
             $removeRolePermissionService->execute(["roleId" => $roleId, "permissionId" => $permissionId]);
 
-            return redirect()
-                ->route("roles.show", ["id" => $roleId])
-                ->withSuccess(__("actions.success"));
+            return $this->success($request, "roles.show", ["id" => $roleId]);
         } catch (Exception $e) {
-            return back()->with("error", __("actions.error"));
+            return $this->error($request, __("actions.error"), $e->getCode());
         }
     }
 }

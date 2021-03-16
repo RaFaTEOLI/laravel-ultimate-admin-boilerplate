@@ -24,22 +24,32 @@ trait ReturnHandler
 
 	}
 
-    protected function success($request, $view = "/")
+    protected function success($request, $view = "/", $data = null)
 	{
         if ($request->is("api/*")) {
             return response()->noContent();
         } else {
             toastr()->success('Saved successfully!');
 
-            return redirect()
-                ->route($view)
-                ->withSuccess(__("actions.success"));
+            if ($data) {
+                return redirect()
+                    ->route($view, $data)
+                    ->withSuccess(__("actions.success"));
+            } else {
+                return redirect()
+                    ->route($view)
+                    ->withSuccess(__("actions.success"));
+            }
+
         }
 
 	}
 
 	protected function error($request, string $message = null, int $code, $data = null)
 	{
+        if ($code == 0) {
+            $code = 500;
+        }
         if ($request->is("api/*")) {
             return response()->json([
                 'status' => 'Error',

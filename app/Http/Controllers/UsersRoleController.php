@@ -6,11 +6,14 @@ use App\Http\Requests\UserRole\UsersRoleRequest;
 use Illuminate\Support\Facades\Validator;
 use App\Services\User\UpdateUserRoleService;
 use App\Services\User\RemoveUserRoleService;
+use App\Traits\ReturnHandler;
+use Illuminate\Http\Request;
 use Exception;
 
 class UsersRoleController extends Controller
 {
-    public function store($userId, $roleId)
+    use ReturnHandler;
+    public function store($userId, $roleId, Request $request)
     {
         try {
             $validator = Validator::make(
@@ -19,6 +22,7 @@ class UsersRoleController extends Controller
             );
 
             if ($validator->fails()) {
+                return $this->error($request, __("actions.error"), $e->getCode());
                 return redirect()
                     ->back()
                     ->withErrors($validator->errors());
@@ -27,19 +31,13 @@ class UsersRoleController extends Controller
             $updateUserRoleService = new UpdateUserRoleService();
             $updateUserRoleService->execute(["userId" => $userId, "roleId" => $roleId]);
 
-            toastr()->success('Saved successfully!');
-
-            return redirect()
-                ->route("users.show", ["id" => $userId])
-                ->withSuccess(__("actions.success"));
+            return $this->success($request, "users.show", ["id" => $userId]);
         } catch (Exception $e) {
-            toastr()->error('An error has occurred please try again later.');
-
-            return back()->with("error", __("actions.error"));
+            return $this->error($request, __("actions.error"), $e->getCode());
         }
     }
 
-    public function destroy($userId, $roleId)
+    public function destroy($userId, $roleId, Request $request)
     {
         try {
             $validator = Validator::make(["user_id" => $userId, "role_id" => $roleId], UsersRoleRequest::deleteRules());
@@ -53,15 +51,9 @@ class UsersRoleController extends Controller
             $removeUserRoleService = new RemoveUserRoleService();
             $removeUserRoleService->execute(["userId" => $userId, "roleId" => $roleId]);
 
-            toastr()->success('Saved successfully!');
-
-            return redirect()
-                ->route("users.show", ["id" => $userId])
-                ->withSuccess(__("actions.success"));
+            return $this->success($request, "users.show", ["id" => $userId]);
         } catch (Exception $e) {
-            toastr()->error('An error has occurred please try again later.');
-
-            return back()->with("error", __("actions.error"));
+            return $this->error($request, __("actions.error"), $e->getCode());
         }
     }
 }

@@ -7,10 +7,12 @@ use App\Repositories\PermissionRepository\PermissionRepository;
 use Illuminate\Http\Request;
 use App\Repositories\RolesRepository\RolesRepository;
 use App\Services\Role\CreateRoleService;
+use App\Traits\ReturnHandler;
 use Exception;
 
 class RolesController extends Controller
 {
+    use ReturnHandler;
     private $rolesRepository;
 
     public function __construct()
@@ -19,13 +21,11 @@ class RolesController extends Controller
         $this->rolesRepository = new RolesRepository();
     }
 
-    public function index()
+    public function index(Request $request)
     {
         $roles = $this->rolesRepository->all();
 
-        return view("admin/role/roles", [
-            "roles" => $roles,
-        ]);
+        return $this->loaded($request, ["roles" => $roles], 200, "admin/role/roles");
     }
 
     public function store(RoleRequest $request)
@@ -36,24 +36,18 @@ class RolesController extends Controller
             $createRoleService = new CreateRoleService();
             $createRoleService->execute($input);
 
-            toastr()->success('Saved successfully!');
-
-            return redirect()
-                ->route("roles")
-                ->withSuccess(__("actions.success"));
+            return $this->success($request, "roles");
         } catch (Exception $e) {
-            toastr()->error('An error has occurred please try again later.');
-
-            return back()->with("error", __("actions.error"));
+            return $this->error($request, __("actions.error"), $e->getCode());
         }
     }
 
-    public function show($id)
+    public function show($id, Request $request)
     {
         $role = $this->rolesRepository->findById($id);
         $permissions = (new PermissionRepository())->findPermissionsNotInRole($id);
 
-        return view("admin/role/role", ["role" => $role, "permissions" => $permissions]);
+        return $this->loaded($request, ["role" => $role, "permissions" => $permissions], 200, "admin/role/role");
     }
 
     public function update($id, Request $request)
@@ -62,30 +56,21 @@ class RolesController extends Controller
             $input = $request->only(["name", "display_name", "description"]);
             $this->rolesRepository->update($id, $input);
 
-            return redirect()
-                ->route("roles")
-                ->withSuccess(__("actions.success"));
-
+            return $this->success($request, "roles");
         } catch (Exception $e) {
-            toastr()->error('An error has occurred please try again later.');
-
-            return back()->with("error", __("actions.error"));
+            return $this->error($request, __("actions.error"), $e->getCode());
         }
 
     }
 
-    public function destroy($id)
+    public function destroy($id, Request $request)
     {
         try {
             $this->rolesRepository->delete($id);
 
-            return redirect()
-                ->route("roles")
-                ->withSuccess(__("actions.success"));
+            return $this->success($request, "roles");
         } catch (Exception $e) {
-            toastr()->error('An error has occurred please try again later.');
-
-            return back()->with("error", __("actions.error"));
+            return $this->error($request, __("actions.error"), $e->getCode());
         }
     }
 }
