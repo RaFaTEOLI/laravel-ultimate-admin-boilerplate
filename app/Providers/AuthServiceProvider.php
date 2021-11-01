@@ -64,7 +64,7 @@ class AuthServiceProvider extends ServiceProvider
                 if (str_contains($url, '127.0.0.1')) {
                     $url = str_replace('http://127.0.0.1/api', env('EXTERNAL_APP_URL'), $url);
                 } else if (str_contains($url, env('EXTERNAL_APP_URL'))) {
-                    $url = str_replace(env('EXTERNAL_APP_URL') . '/api', env('EXTERNAL_APP_URL'), $url);
+                    $url = str_replace(env('EXTERNAL_APP_URL'), env('EXTERNAL_APP_URL'), $url);
                 } else {
                     $url = str_replace(env('APP_URL') . '/api', env('EXTERNAL_APP_URL'), $url);
                 }
