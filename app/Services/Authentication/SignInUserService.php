@@ -7,9 +7,12 @@ use Illuminate\Support\Facades\Auth;
 
 class SignInUserService
 {
-    public function execute($array) {
-        if (!Auth::attempt($array)) {
-            throw new UserWrongCredentials('Credentials do not match', 401);
+    public function execute($array)
+    {
+        $user = Auth::attempt($array);
+        if (!$user) {
+            throw new UserWrongCredentials(__('auth.failed'), 401);
         }
+        return $user;
     }
 }

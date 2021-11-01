@@ -3,14 +3,12 @@
 namespace Tests\Feature;
 
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Laravel\Jetstream\Http\Livewire\TwoFactorAuthenticationForm;
-use Livewire\Livewire;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Tests\TestCase;
 
 class TwoFactorAuthenticationSettingsTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     public function test_two_factor_authentication_can_be_enabled()
     {
@@ -18,13 +16,10 @@ class TwoFactorAuthenticationSettingsTest extends TestCase
 
         $this->withSession(['auth.password_confirmed_at' => time()]);
 
-        Livewire::test(TwoFactorAuthenticationForm::class)
-                ->call('enableTwoFactorAuthentication');
+        $response = $this->post('/user/two-factor-authentication');
 
-        $user = $user->fresh();
-
-        $this->assertNotNull($user->two_factor_secret);
-        $this->assertCount(8, $user->recoveryCodes());
+        $this->assertNotNull($user->fresh()->two_factor_secret);
+        $this->assertCount(8, $user->fresh()->recoveryCodes());
     }
 
     public function test_recovery_codes_can_be_regenerated()
@@ -33,13 +28,12 @@ class TwoFactorAuthenticationSettingsTest extends TestCase
 
         $this->withSession(['auth.password_confirmed_at' => time()]);
 
-        $component = Livewire::test(TwoFactorAuthenticationForm::class)
-                ->call('enableTwoFactorAuthentication')
-                ->call('regenerateRecoveryCodes');
+        $this->post('/user/two-factor-authentication');
+        $this->post('/user/two-factor-recovery-codes');
 
         $user = $user->fresh();
 
-        $component->call('regenerateRecoveryCodes');
+        $this->post('/user/two-factor-recovery-codes');
 
         $this->assertCount(8, $user->recoveryCodes());
         $this->assertCount(8, array_diff($user->recoveryCodes(), $user->fresh()->recoveryCodes()));
@@ -51,12 +45,11 @@ class TwoFactorAuthenticationSettingsTest extends TestCase
 
         $this->withSession(['auth.password_confirmed_at' => time()]);
 
-        $component = Livewire::test(TwoFactorAuthenticationForm::class)
-                ->call('enableTwoFactorAuthentication');
+        $this->post('/user/two-factor-authentication');
 
         $this->assertNotNull($user->fresh()->two_factor_secret);
 
-        $component->call('disableTwoFactorAuthentication');
+        $this->delete('/user/two-factor-authentication');
 
         $this->assertNull($user->fresh()->two_factor_secret);
     }

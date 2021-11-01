@@ -18,6 +18,7 @@ class RouteServiceProvider extends ServiceProvider
      * @var string
      */
     public const HOME = '/dashboard';
+    public const EMAIl_VERIFY = '/email/verify';
 
     /**
      * The controller namespace for the application.
@@ -39,28 +40,20 @@ class RouteServiceProvider extends ServiceProvider
 
         $this->routes(function () {
             Route::prefix('api')
+                ->middleware('api')
                 ->namespace($this->namespace)
                 ->group(base_path('routes/api/api.php'));
 
             $this->loadApiRoute("user");
             $this->loadApiRoute("role");
             $this->loadApiRoute("permission");
+            $this->loadApiRoute("verify");
+            $this->loadApiRoute("reset");
 
             Route::middleware('web')
                 ->namespace($this->namespace)
-                ->group(base_path('routes/web/web.php'));
-
-            $this->loadWebRoute("user");
-            $this->loadWebRoute("role");
-            $this->loadWebRoute("permission");
+                ->group(base_path('routes/web.php'));
         });
-    }
-
-    private function loadWebRoute($routeName)
-    {
-        Route::middleware("web")
-            ->namespace($this->namespace)
-            ->group(base_path("routes/web/{$routeName}.php"));
     }
 
     private function loadApiRoute($routeName)

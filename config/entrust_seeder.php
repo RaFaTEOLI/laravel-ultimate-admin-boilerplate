@@ -5,18 +5,17 @@ return [
         'admin' => [
             'users' => 'c,r,u,d',
             'admin' => 'c,r,u,d',
-            'roles' => 'c,r,u,d',
+            'profile' => 'r,d',
             'permissions' => 'c,r,u,d',
-            'profile' => 'r,d'
+            'roles' => 'c,r,u,d',
         ],
-        'subadmin' => [
-            'users' => 'c,r,u',
+        'customer' => [
             'profile' => 'r,u'
         ],
     ],
     'user_roles' => [
         'admin' => [
-            ['name' => "Admin", "email" => "admin@rafateoli.com", "password" => '123456'],
+            ['name' => "Admin", "email" => "admin@gmail.com", "password" => 'password'],
         ],
     ],
     'permissions_map' => [

@@ -2,24 +2,24 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\HttpStatus;
 use Exception;
 use App\Services\RolePermission\UpdateRolePermissionService;
 use App\Services\RolePermission\RemoveRolePermissionService;
 use App\Http\Requests\RolePermission\RolePermissionRequest;
-use App\Traits\ReturnHandler;
-use Illuminate\Http\Request;
+use App\Traits\ApiResponser;
 use Illuminate\Support\Facades\Validator;
 
 class RolesPermissionController extends Controller
 {
-    use ReturnHandler;
+    use ApiResponser;
 
-    public function store($roleId, $permissionId, Request $request)
+    public function store($roleId, $permissionId)
     {
         try {
             $validator = Validator::make(
                 ["role_id" => $roleId, "permission_id" => $permissionId],
-                RolePermissionRequest::rules($roleId),
+                RolePermissionRequest::rules($roleId)
             );
 
             if ($validator->fails()) {
@@ -31,22 +31,21 @@ class RolesPermissionController extends Controller
             $updateRolePermissionService = new UpdateRolePermissionService();
             $updateRolePermissionService->execute(["roleId" => $roleId, "permissionId" => $permissionId]);
 
-            return $this->success($request, "roles.show", ["id" => $roleId]);
+            return $this->success(["id" => $roleId], HttpStatus::SUCCESS);
         } catch (Exception $e) {
-            return $this->error($request, __("actions.error"), $e->getCode());
+            return $this->error(__("actions.error"), $e->getCode());
         }
     }
 
-    public function destroy($roleId, $permissionId, Request $request)
+    public function destroy($roleId, $permissionId)
     {
         try {
             $validator = Validator::make(
                 ["role_id" => $roleId, "permission_id" => $permissionId],
-                RolePermissionRequest::deleteRules(),
+                RolePermissionRequest::deleteRules()
             );
 
             if ($validator->fails()) {
-                dd($validator->errors());
                 return redirect()
                     ->back()
                     ->withErrors($validator->errors());
@@ -55,9 +54,9 @@ class RolesPermissionController extends Controller
             $removeRolePermissionService = new RemoveRolePermissionService();
             $removeRolePermissionService->execute(["roleId" => $roleId, "permissionId" => $permissionId]);
 
-            return $this->success($request, "roles.show", ["id" => $roleId]);
+            return $this->success(["id" => $roleId], HttpStatus::SUCCESS);
         } catch (Exception $e) {
-            return $this->error($request, __("actions.error"), $e->getCode());
+            return $this->error(__("actions.error"), $e->getCode());
         }
     }
 }

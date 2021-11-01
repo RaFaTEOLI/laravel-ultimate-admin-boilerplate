@@ -17,17 +17,17 @@ Route::group(["middleware" => "auth:sanctum"], function () {
 
         Route::get("users", [UserController::class, 'index'])->middleware("permission:read-users");
 
-        Route::delete("/user/{id}", [UserController::class, 'destroy'])->middleware("permission:delete-users");
+        Route::delete("/users/{id}", [UserController::class, 'destroy'])->middleware("permission:delete-users");
 
         Route::post("/users", [UserController::class, 'store'])->middleware("permission:create-users");
 
         Route::put("users/{id}", [UserController::class, 'update'])->middleware("permission:update-users");
 
         Route::patch("/users/{userId}/role/{roleId}", [UsersRoleController::class, 'store'])->middleware(
-            "permission:update-users",
+            "permission:update-users"
         );
         Route::delete("/users/{userId}/role/{roleId}", [UsersRoleController::class, 'destroy'])->middleware(
-            "permission:update-users",
+            "permission:update-users"
         );
     });
 });
