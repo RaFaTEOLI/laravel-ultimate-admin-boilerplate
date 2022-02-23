@@ -66,7 +66,7 @@ class ResetPasswordController extends Controller
      *    description="Send email",
      *    @OA\JsonContent(
      *       @OA\Property(property="email", type="string", format="email", example="youremail@email.com"),
-     *       @OA\Property(property="token", type="string" example="$2y$10$IqrVuWeqe1ed/n4KtIpm5ul.yajCvcsKmlmFbuP9yeP8mRjQXYD8S"),
+     *       @OA\Property(property="token", type="string", example="2y10IqrVuWeqe1edn4KtIpm5ulyajCvcsKmlmFbuP9yeP8mRjQXYD8S"),
      *       @OA\Property(property="password", type="string", format="password", example="password"),
      *       @OA\Property(property="password_confirmation", type="string", format="password", example="password"),
      *    ),

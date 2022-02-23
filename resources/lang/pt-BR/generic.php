@@ -17,5 +17,6 @@ return [
     'invalidLocalization' => ':locale não é um idioma suportado!',
     'working' => "Está funcionando!",
     'tokensRevoked' => 'Tokens revogados',
-    'cannotRemoveRoleAdminUser' => 'Não pode remover esse tipo do usuário porque ele é admin'
+    'cannotRemoveRoleAdminUser' => 'Não pode remover esse tipo do usuário porque ele é admin',
+    'noPermission' => 'Você não tem permissão para realizar essa ação!'
 ];

@@ -21,8 +21,6 @@ Route::group(["middleware" => "auth:sanctum"], function () {
 
         Route::post("/users", [UserController::class, 'store'])->middleware("permission:create-users");
 
-        Route::put("users/{id}", [UserController::class, 'update'])->middleware("permission:update-users");
-
         Route::patch("/users/{userId}/role/{roleId}", [UsersRoleController::class, 'store'])->middleware(
             "permission:update-users"
         );
@@ -30,4 +28,6 @@ Route::group(["middleware" => "auth:sanctum"], function () {
             "permission:update-users"
         );
     });
+    Route::put("users/{id}", [UserController::class, 'update']);
+    Route::post("/users/profile-photo", [UserController::class, 'updatePhoto']);
 });

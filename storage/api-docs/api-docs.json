@@ -564,7 +564,11 @@
                                     "email": {
                                         "type": "string",
                                         "format": "email",
-                                        "example": "user@email.com"
+                                        "example": "youremail@email.com"
+                                    },
+                                    "token": {
+                                        "type": "string",
+                                        "example": "2y10IqrVuWeqe1edn4KtIpm5ulyajCvcsKmlmFbuP9yeP8mRjQXYD8S"
                                     },
                                     "password": {
                                         "type": "string",
@@ -1097,6 +1101,49 @@
                 "responses": {
                     "204": {
                         "description": "No Content"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/users/profile-photo": {
+            "post": {
+                "tags": [
+                    "User"
+                ],
+                "summary": "Update User Profile Photo",
+                "description": "Update User Profile Photo",
+                "operationId": "updatePhoto",
+                "requestBody": {
+                    "description": "Send photo to update",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "photo": {
+                                        "type": "file"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UserRoles"
+                                }
+                            }
+                        }
                     }
                 },
                 "security": [

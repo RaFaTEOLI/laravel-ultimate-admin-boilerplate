@@ -69,12 +69,28 @@ echo './vendor/bin/sail up -d'
 ./vendor/bin/sail up -d;
 
 echo '';
-echo '┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━';
-echo '┃ 🚀 [1mMigrate the database[0m';
+echo -e '┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━';
+echo -e '┃ 🚀 [1mMigrate the database[0m';
 
-echo '┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━';echo '';
+echo -e '┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━';echo '';
+
+echo 'Waiting for database to accept connections...'
+attempt=1;
+maxAttempts=8;
+sleepTime=5;
+until ./vendor/bin/sail artisan tinker --execute 'try { DB::statement("select true"); echo("DB ready"); } catch (Throwable $e) { exit(1); }' | grep -q "DB ready" || [ $attempt -eq $maxAttempts ]; do
+    echo "Attempt $attempt failed, retrying in ${sleepTime}s...";
+    ((attempt=attempt+1));
+    sleep $sleepTime;
+done
+
+if [ "$attempt" -eq "$maxAttempts" ]; then
+    echo "Could not connect to database after $attempt attempts! Aborting...";
+fi
+
+echo "Database ready!"
 echo './vendor/bin/sail artisan migrate'
-./vendor/bin/sail artisan migrate;
+./vendor/bin/sail artisan migrate
 
 echo '';
 echo '┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━';
@@ -96,15 +112,17 @@ echo './vendor/bin/sail npm run dev'
 
 echo '';
 echo '┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━';
-echo '┃ 🚀 [1mFixing Directoy Permissions[0m';
+echo '┃ 🚀 [1mFixing Directoy and Files Permissions[0m';
 
 echo '┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━';echo '';
 echo 'sudo chmod +x run'
 echo sudo chmod +x run;
-echo './run "chmod 777 -R storage/logs/"'
-./run "chmod 777 -R storage/logs/";
-echo './run "chmod 777 -R storage/framework/"'
-./run "chmod 777 -R storage/framework/";
+echo 'sudo chmod 777 -R storage/logs/'
+sudo chmod 777 -R storage/logs/;
+echo 'sudo chmod 777 -R storage/framework/'
+sudo chmod 777 -R storage/framework/;
+echo 'sudo chmod 777 -R storage/app/public/profile-photos'
+sudo chmod 777 -R storage/app/public/profile-photos;
 
 # Remove TODO in readme
 perl -0777 -pi -e 's/<!-- Initializer for Laravel Todos START  -->.*<!-- Initializer for Laravel Todos END  -->//gs' README.md

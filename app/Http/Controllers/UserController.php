@@ -3,15 +3,22 @@
 namespace App\Http\Controllers;
 
 use App\Http\HttpStatus;
+use App\Http\Requests\User\UpdateUserProfilePhotoRequest;
 use App\Http\Requests\User\UpdateUserRequest;
 use Illuminate\Http\Request;
 use App\Repositories\User\UserRepository;
 use App\Services\User\CreateUserService;
 use App\Repositories\RolesRepository\RolesRepository;
 use App\Http\Requests\User\UserRequest;
+use App\Services\User\UpdateProfilePhotoService;
 use App\Traits\ApiResponser;
 use App\Traits\Pagination;
 use Exception;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
+use App\Models\User;
+use Illuminate\Auth\Access\AuthorizationException;
 
 class UserController extends Controller
 {
@@ -190,13 +197,54 @@ class UserController extends Controller
     public function update($id, UpdateUserRequest $request)
     {
         try {
+            Gate::authorize('update', User::findOrFail($id));
             $input = $request->only(["name", "email"]);
             $this->userRepository->update($id, $input);
 
             return response()->noContent();
+        } catch (AuthorizationException $aE) {
+            return $this->error($aE->getMessage(), HttpStatus::FORBIDDEN);
+        } catch (ModelNotFoundException $m) {
+            return $this->error($m->getMessage(), HttpStatus::NOT_FOUND);
         } catch (Exception $e) {
-            dd($e);
             return $this->error($e->getMessage(), $e->getCode());
+        }
+    }
+
+    /**
+     * @OA\Post(
+     * path="/users/profile-photo",
+     * summary="Update User Profile Photo",
+     * description="Update User Profile Photo",
+     * operationId="updatePhoto",
+     * security={ {"bearerAuth":{}} },
+     * tags={"User"},
+     * @OA\RequestBody(
+     *    required=true,
+     *    description="Send photo to update",
+     *    @OA\JsonContent(
+     *       @OA\Property(property="photo", type="file"),
+     *    ),
+     * ),
+     * @OA\Response(
+     *     response=200,
+     *     description="Success",
+     *     @OA\JsonContent(
+     *      ref="#/components/schemas/UserRoles",
+     *      ),
+     *    ),
+     *  ),
+     * )
+     */
+    public function updatePhoto(UpdateUserProfilePhotoRequest $request)
+    {
+        try {
+            $inputPhoto = $request->only(["photo"]);
+            $user = (new UpdateProfilePhotoService())->execute(Auth::user()->id, $inputPhoto);
+
+            return $this->success($user->format());
+        } catch (Exception $e) {
+            return $this->error($e->getMessage(), HttpStatus::SERVER_ERROR);
         }
     }
 

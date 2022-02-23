@@ -40,7 +40,7 @@ class UserRepository implements UserRepositoryInterface
     {
         return User::where("id", $id)
             ->where("deleted_at", null)
-            ->first()
+            ->firstOrFail()
             ->format();
     }
 
@@ -51,13 +51,13 @@ class UserRepository implements UserRepositoryInterface
     {
         return User::where("email", $email)
             ->where("deleted_at", null)
-            ->first()
+            ->firstOrFail()
             ->format();
     }
 
     public function update($userId, $set)
     {
-        $user = User::where("id", $userId)->first();
+        $user = User::where("id", $userId)->firstOrFail();
 
         $user->update($set);
     }

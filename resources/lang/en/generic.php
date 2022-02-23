@@ -17,5 +17,6 @@ return [
     'invalidLocalization' => ':locale is not a supported language!',
     'working' => "It's working",
     'tokensRevoked' => 'Tokens Revoked',
-    'cannotRemoveRoleAdminUser' => 'Cannot remove this role from user because he is admin'
+    'cannotRemoveRoleAdminUser' => 'Cannot remove this role from user because he is admin',
+    'noPermission' => 'You don\'t have permission to perform this action!'
 ];
